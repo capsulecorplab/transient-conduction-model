@@ -1,0 +1,46 @@
+name: Build & deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Install nodejs & npm
+        run: sudo apt install nodejs && sudo apt install npm
+
+      - name: Update nodejs & npm
+        run: sudo npm install -g npm@11.16.0
+
+      - name: Install LinkML
+        run: pip install linkml==1.10.0
+
+      - name: Install Tex Live
+        run: sudo apt install texlive-full
+
+      - name: Install Myst Markdown
+        run: pip install mystmd
+
+      - name: Install yq # as per https://github.com/mikefarah/yq#plain-binary
+        run: sudo wget https://github.com/mikefarah/yq/releases/download/v4.35.1/yq_linux_amd64 -O /usr/bin/yq && sudo chmod +x /usr/bin/yq
+
+      - name: Install dependencies
+        run: npm i
+
+      - name: Run build
+        run: npm run build
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+          # or github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./build/views/web
