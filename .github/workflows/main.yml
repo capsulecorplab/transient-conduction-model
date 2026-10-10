@@ -22,8 +22,11 @@ jobs:
       - name: Install LinkML
         run: pip install linkml==1.10.0
 
+      - name: Install nix
+        run: sh <(curl -L https://nixos.org/nix/install) --no-daemon
+
       - name: Install Tex Live
-        run: sudo apt install texlive-full
+        run: nix profile --extra-experimental-features nix-command --extra-experimental-features flakes install nixpkgs#texliveFull
 
       - name: Install Myst Markdown
         run: pip install mystmd
